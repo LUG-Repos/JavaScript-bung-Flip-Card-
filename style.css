@@ -1,0 +1,105 @@
+body{
+    background-color: rgb(35, 35, 35);
+    color: white;
+    font-family: monospace;
+}
+
+.spielkarte{
+    background-color: rgb(55, 55, 55);
+    width: 200px;
+    height: 350px;
+    border-radius: 10px;
+    border: 2px solid rgb(255, 255, 255);
+    box-shadow: 0px 0px 10px black;
+    overflow: hidden;
+}
+
+.spielkarte .front{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    display: flex;
+}
+
+.spielkarte .back{
+    background-image: url("./imgs/background_card.jpg");
+    height: 100%;
+}
+
+.flipFrontStep1{
+    animation: flipFrontStep1 200ms forwards;
+}
+
+.flipFrontStep2{
+    animation: flipFrontStep2 200ms forwards;
+}
+
+.flipBackStep1{
+    animation: flipBackStep1 200ms forwards;
+}
+
+.flipBackStep2{
+    animation: flipBackStep2 200ms forwards;
+}
+
+.kartenTitel{
+    font-size: 15px;
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.275);
+}
+
+.spielkarte img{
+    width: 90%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid rgb(255, 255, 255);
+}
+
+.spielkarte p{
+    padding: 0px 5%;
+    font-size: 9px;
+    
+}
+
+
+@keyframes flipFrontStep1 {
+    from{
+        transform: rotateY(0deg);
+    }
+    to{
+        transform: rotateY(90deg);
+    }
+}
+
+@keyframes flipFrontStep2 {
+    from{
+        transform: rotateY(90deg);
+    }
+    to{
+        transform: rotateY(0deg);
+    }
+}
+
+
+
+@keyframes flipBackStep1 {
+    from{
+        transform: rotateY(0deg);
+    }
+    to{
+        transform: rotateY(90deg);
+    }
+}
+
+@keyframes flipBackStep2 {
+    from{
+        transform: rotateY(90deg);
+    }
+    to{
+        transform: rotateY(0deg);
+    }
+}
