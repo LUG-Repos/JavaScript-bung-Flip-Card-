@@ -12,8 +12,10 @@ body{
     border: 2px solid rgb(255, 255, 255);
     box-shadow: 0px 0px 10px black;
     overflow: hidden;
+    position: absolute;
+    top: 50px;
+    left: 50px;
 }
-
 .spielkarte .front{
     display: flex;
     flex-direction: column;
