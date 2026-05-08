@@ -8,14 +8,25 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="karte001" class="spielkarte" onclick="flip(this)">
-        <div class="front">
-            <span class="kartenTitel"></span>
-            <img alt="Bild der Spielkarte"/>
-            <p></p>
+    <div id="sidemenu">
+        <div>
+            <h2>Gegner:</h2>
+            <div id="opponent"></div>
         </div>
-        <div class="back"></div>
+        <div id="gameinfo">
+            <h2>Runde:<span>0</span></h2>
+            <h2>Aktueller Spieler:<span>Spieler</span></h2>
+        
+        </div>
+        <div>
+            <h2>Verbleibende Zeit:</h2>
+            <p id="timer">60</p>
+        </div>
     </div>
-    <button id="control_NextCard" onclick="nextCard()">Nächste Karte</button>
+    <div class="stapel">
+        <div class="pseudokarte"></div>
+        <div class="pseudokarte"></div>
+        <div class="pseudokarte" onclick="addPlayerCards()"></div>
+    </div>
 </body>
 </html>

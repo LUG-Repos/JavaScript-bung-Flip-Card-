@@ -1,7 +1,38 @@
 body{
-    background-color: rgb(35, 35, 35);
+    background-image: url("./imgs/playfield.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
     color: white;
     font-family: monospace;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#sidemenu{
+    background-image: url("./imgs/sidebar.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
+    width: 300px;
+    position: absolute;
+    right: 0;
+    color: black;
+    text-shadow: 0px 0px 10px rgb(0, 0, 0);
+    padding-left: 100px;
+}
+
+
+
+#timer{
+    font-size: 60px;
+    font-weight: bold;
+    margin-top: 0px;
+    text-shadow: 0px 0px 0px rgb(0, 0, 0);
+    text-align: center;
+    
+
 }
 
 .spielkarte{
@@ -13,8 +44,6 @@ body{
     box-shadow: 0px 0px 10px black;
     overflow: hidden;
     position: absolute;
-    top: 50px;
-    left: 50px;
 }
 .spielkarte .front{
     display: flex;
@@ -28,6 +57,26 @@ body{
 .spielkarte .back{
     background-image: url("./imgs/background_card.jpg");
     height: 100%;
+}
+
+.pseudokarte{
+    background-image: url("./imgs/background_card.jpg");
+    width: 100px;
+    height: 175px;
+    border-radius: 10px;
+    border: 2px solid rgb(255, 255, 255);
+    box-shadow: 0px 0px 10px black;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+.stapel{
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    width: 120px;
+    height: 195px;
 }
 
 .flipFrontStep1{
@@ -65,6 +114,33 @@ body{
     padding: 0px 5%;
     font-size: 9px;
     
+}
+
+#opponent{
+    width: 250px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#opponent_img{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid rgb(163, 162, 105);
+    box-shadow: 0px 0px 10px black;
+    margin-top: 20px;
+}
+
+#opponent_name{
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 10px;
+    text-shadow: none;
+    color: white;
+    background-color: rgb(113, 114, 78);
+    padding: 5px;
 }
 
 
