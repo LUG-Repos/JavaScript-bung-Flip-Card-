@@ -14,6 +14,7 @@ const texts = [
     "Unterstützung, die den Helden in ihrem Kampf gegen das Böse zur Seite steht und ihnen den entscheidenden Vorteil verschafft."
 ];
 const html_karte = '<div class="spielkarte" onclick="flip(this)"><div class="front"><span class="kartenTitel"></span><img alt="Bild der Spielkarte"/><p></p></div><div class="back"></div></div>'
+const standatdKarte = '<div class="pseudokarte"></div>'
 let round = "player";
 const card_ids = [];
 const hand = {
@@ -48,9 +49,44 @@ const hand = {
         rot: "25deg"
     }
 }
-let timer = 60;
+const opponent_hand = {
+    1:{
+        card: null,
+        posx: "25vw",
+        posy: "-15px",
+        rot: "15deg"
+    },
+    2:{
+        card: null,
+        posx: "30vw",
+        posy: "-10px",
+        rot: "5deg"
+    },
+    3:{
+        card: null,
+        posx: "35vw",
+        posy: "10px",
+        rot: "-10deg"
+    },
+    4:{
+        card: null,
+        posx: "40vw",
+        posy: "-15px",
+        rot: "-20deg"
+    },
+    5:{
+        card: null,
+        posx: "45vw",
+        posy: "-20px",
+        rot: "-25deg"
+    }
+}
+let roundCounter = 0;
+let timer = 5;
 load_opponent();
 clock();
+player_card_counter = 0;
+opponent_card_counter = 0;
 
 
 
@@ -109,32 +145,46 @@ function randomCard(karte){
 }
 
 function addPlayerCards(){
+    if(player_card_counter >= 5){
+        return;
+    }
     if(round == "player"){
-        for(let i = 0; i < 3; i++){
-            // HTML-String in ein Element umwandeln
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = html_karte;
-            const new_karte = tempDiv.firstChild;
-            let new_random_id = "karte" + Math.floor(Math.random() * 1000000);
-            while(card_ids.includes(new_random_id)){
-                new_random_id = "karte" + Math.floor(Math.random() * 1000000);
+        if(roundCounter == 0 && player_card_counter == 0){
+            for(let i = 0; i < 3; i++){
+                addPlayerCard();
+                player_card_counter = 3;
             }
-            new_karte.id = new_random_id;
-            new_karte.classList.add("on_hand")
-            card_ids.push(new_random_id);
-            document.getElementsByTagName("body")[0].appendChild(new_karte);
         }
+        else{
+            addPlayerCard();
+            player_card_counter += 1;
+        }
+
+    } 
+}
+
+function addPlayerCard(){
+    // HTML-String in ein Element umwandeln
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html_karte;
+        const new_karte = tempDiv.firstChild;
+        let new_random_id = "karte" + Math.floor(Math.random() * 1000000);
+        while(card_ids.includes(new_random_id)){
+            new_random_id = "karte" + Math.floor(Math.random() * 1000000);
+        }
+        new_karte.id = new_random_id;
+        new_karte.classList.add("on_hand")
+        card_ids.push(new_random_id);
+        document.getElementsByTagName("body")[0].appendChild(new_karte);
+        
         const handcards = document.getElementsByClassName("on_hand");
         for(let i = 0; i < handcards.length; i++){
-            randomCard(handcards[i]);
+            randomCard(handcards[handcards.length - 1]);
             hand[i+1].card = handcards[i];
             handcards[i].style.left = hand[i+1].posx;
             handcards[i].style.bottom = hand[i+1].posy;
             handcards[i].style.transform = "rotate(" + hand[i+1].rot + ")";
-
         }
-
-    } 
 }
 
 function clock(){
@@ -145,14 +195,17 @@ function clock(){
     setInterval(function() {
         timer--;
         if(timer < 0){
-           timer = 60;
+           timer = 5;
            if(round == "player"){
             round = "opponent";
+            addOpponentCards();
+            runde.textContent = parseInt(runde.textContent) +1;
+            roundCounter += 1;
            }
            else{
             round = "player";
            }
-           runde.textContent = parseInt(runde.textContent) +1;
+           
             currentPlayer.textContent = round;
         }
         if(timer <= 10){
@@ -164,6 +217,47 @@ function clock(){
         document.getElementById("timer").textContent = timer;
         
     }, 1000);
+}
+function addOpponentCards(){
+    if(opponent_card_counter >= 5){
+        return;
+    }
+    if(roundCounter == 0 && opponent_card_counter == 0){
+        for(let i = 0; i < 3; i++){
+            addOpponentCard();
+            opponent_card_counter = 3;
+        }
+        
+    }
+    else{
+        addOpponentCard();
+        opponent_card_counter += 1;
+    }
+
+}
+
+function addOpponentCard(){
+            // HTML-String in ein Element umwandeln
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = standatdKarte;
+        const new_karte = tempDiv.firstChild;
+        let new_random_id = "karte" + Math.floor(Math.random() * 1000000);
+        while(card_ids.includes(new_random_id)){
+            new_random_id = "karte" + Math.floor(Math.random() * 1000000);
+        }
+        new_karte.id = new_random_id;
+        new_karte.classList.add("on_opponent_hand")
+        card_ids.push(new_random_id);
+        document.getElementsByTagName("body")[0].appendChild(new_karte);
+
+        const handcards = document.getElementsByClassName("on_opponent_hand");
+        for(let i = 0; i < handcards.length; i++){
+            opponent_hand[i+1].card = handcards[i];
+            handcards[i].style.left = opponent_hand[i+1].posx;
+            handcards[i].style.top = opponent_hand[i+1].posy;
+            handcards[i].style.transform = "rotate(" + opponent_hand[i+1].rot + ")";
+        }
+
 }
 
 async function load_opponent(){
