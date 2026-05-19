@@ -261,15 +261,18 @@ function addOpponentCard(){
 }
 
 async function load_opponent(){
-    const response = await fetch("https://randomuser.me/api/");
+    const response = await fetch("/opponent");
     const data = await response.json();
-    console.log(data);
+    const opponent_name = data.name;
+    const opponent_image = data.image;
+
+
     const opponent_profile = document.getElementById("opponent");
     const img = document.createElement("img");
-    img.src = data.results[0].picture.large;
+    img.src = opponent_image;
     opponent_profile.appendChild(img);
     const name = document.createElement("div");
-    name.textContent = data.results[0].name.first + " " + data.results[0].name.last;
+    name.textContent = opponent_name;
     opponent_profile.appendChild(name);
     img.setAttribute("alt", "Profilbild des Gegners");
     img.setAttribute("id", "opponent_img");

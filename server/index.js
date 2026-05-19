@@ -1,8 +1,45 @@
 const express = require('express')
 const path = require('path')
 const app = express()
-const port = 3001
+const port = 3022
 app.use(express.static(path.join(__dirname, 'public'), {extensions: ['html']}));
+
+spielraum = []
+
+
+async function init_Opponent(){
+    const response = await fetch("https://randomuser.me/api/");
+    const data = await response.json();
+    const image = data.results[0].picture.large;
+    const name = data.results[0].name.first + " " + data.results[0].name.last;
+
+    return {image, name};
+}
+
+app.get('/opponent', async (req, res) => {
+    const opponent = await init_Opponent();
+    res.json(opponent);
+});
+
+app.get('/spielraum', (req, res) => {
+
+  // Wenn kein Spielraum gefunden wird, erstelle einen neuen
+    const spielraum_id = Math.floor(Math.random() * 1000000);
+    const user_id = Math.floor(Math.random() * 1000000);
+    const spiel = {
+        spielraum_id: spielraum_id,
+        user_id: user_id
+    }
+    spielraum.push(spiel);
+    res.json({
+       user_id: user_id,
+       html: `<div class='loading_game'><span>Lade Spiel...</span></div><script>setTimeout(() => {fetch('/opponent_for/${spielraum_id}')}, 2000);</script>`
+    });
+});
+
+
+
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`)

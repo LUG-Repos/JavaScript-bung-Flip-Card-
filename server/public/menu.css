@@ -1,0 +1,125 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    background-image: url('imgs/background.png');
+    background-size: cover;
+    background-position: top;
+    height: 100vh;
+    background-repeat: no-repeat;
+    font-family: 'medieval';
+    overflow: hidden;
+}
+
+.main_menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.main_menu button {
+    width: 40vw;
+    max-width: 500px;
+    height: 50px;
+    margin: 10px;
+    font-size: 30px;
+    cursor: pointer;
+    background: linear-gradient( rgb(255, 0, 0), rgb(230, 99, 99),rgb(255, 0, 0));
+    color: rgb(255, 208, 0);
+    border: none;
+    border-radius: 5px;
+    font-family: 'medieval';
+}
+
+.main_menu button:hover{
+    box-shadow: 0 0 10px rgb(255, 238, 0), 0 0 20px rgb(255, 0, 0), 0 0 30px rgb(255, 0, 0);
+}
+
+.scoreboard_container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    padding-top: 30vh;
+}
+.scoreboard {
+    width: 50vw;
+    min-width: 300px;
+    box-shadow: 0px 0px 10px black;
+}
+
+
+
+.scoreboard table {
+    width: 100%;
+    border-collapse: collapse;
+
+}
+
+.scoreboard td{
+    width: 50%;
+    height: 30px;
+    background-color: rgba(255, 208, 120, 0.411);
+    border: solid 1px rgb(214, 157, 22);
+    font-family: sans-serif;
+    font-size: 20px;
+}
+
+.scoreboard th {
+    background: linear-gradient( rgb(255, 0, 0), rgb(239, 61, 61),rgb(255, 0, 0));
+    color: rgb(255, 208, 0);
+    height: 50px;
+    font-size: 30px;
+    border: solid 1px rgb(214, 157, 22);
+    
+}
+
+#back_to_menu{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+button {
+    padding: 10px;
+    background-color: brown;
+    color: rgb(255, 204, 0);
+    font-size: 0.7em;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 5px black;
+    transition: 0.5s;
+}
+
+button:hover{
+    box-shadow: 0 0 10px rgb(255, 238, 0), 0 0 20px rgb(255, 0, 0), 0 0 30px rgb(255, 0, 0);
+    transition: 0.5s;
+}
+
+@font-face{
+    font-family: 'medieval';
+    src: url('fonts/PrinceValiant.ttf');
+}
+
+.loading_game{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: 'medieval';
+    font-size: 30px;
+}
+
+.loading_game span{
+    background-color: rgb(250, 233, 166);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px black;
+}
