@@ -1,10 +1,18 @@
+//------------------- ZUGANGSDATEN FÜR DIE DATENBANK -------------------
+const dotenv = require('./config');
+const {host, user, password, database} = dotenv.db;
+
+//----------------------------------------------------------------------
+
 const express = require('express')
 const path = require('path')
+const mysql = require('mysql2/promise');
 const app = express()
 const port = 3022
 app.use(express.static(path.join(__dirname, 'public'), {extensions: ['html']}));
 
 spielraum = []
+
 
 
 async function init_Opponent(){
@@ -35,6 +43,12 @@ app.get('/spielraum', (req, res) => {
        user_id: user_id,
        html: `<div class='loading_game'><span>Lade Spiel...</span></div><script>setTimeout(() => {fetch('/opponent_for/${spielraum_id}')}, 2000);</script>`
     });
+});
+
+app.get('/testdb', async (req, res) => {   
+    const connection = await mysql.createConnection({host, user, password, database});
+    const [rows] = await connection.execute('SHOW TABLES');
+    res.json(rows);
 });
 
 

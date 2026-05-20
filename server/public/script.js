@@ -1,280 +1,574 @@
-let mouseX = 0;
-let mouseY = 0;
-
-const imgs = ["knight.png", "hero.png","goblins.png","ambush.png","beggar.png","caravels.png","cavalry.png","support.png"];
-const titles = ["Gefallener Ritter", "Unerschrockener Held", "Goblin Armee", "Hinterhalt", "Schlechte Zeiten", "Reichtum", "Kavallerie", "Unterstützung"];
+const imgs = ["knight.png","hero.png","goblins.png","ambush.png","beggar.png","caravels.png","cavalry.png","support.png"];
+const titles = ["Gefallener Ritter","Unerschrockener Held","Goblin Armee","Hinterhalt","Schlechte Zeiten","Reichtum","Kavallerie","Unterstützung"];
 const texts = [
-    "Ein gefallener Ritter aus den Schattenkriegen des Hochmittelalters, dessen Seele durch endlose Schlachten verhärtet wurde und dessen Klinge unzählige Feinde niedergestreckt hat.",
-    "Ein unerschrockener Held, der sich den Mächten der Dunkelheit entgegenstellt und das Schicksal der Welt in seinen Händen hält.",
-    "Eine Goblin Armee, die aus den Tiefen der Wälder aufsteigt, um Chaos und Zerstörung zu verbreiten.",
-    "Ein hinterhältiger Hinterhalt, der die Feinde überrascht und ihnen den Boden unter den Füßen wegzieht.",
-    "Schlechte Zeiten, in denen die Welt von Dunkelheit und Verzweiflung beherrscht wird, und nur die Mutigsten überleben können.",
-    "Reichtum, der aus den Schätzen der alten Königreiche stammt und unermesslichen Wert besitzt.",
-    "Kavallerie, die mit unbändiger Kraft und Geschwindigkeit über das Schlachtfeld stürmt und ihre Feinde in Angst und Schrecken versetzt.",
-    "Unterstützung, die den Helden in ihrem Kampf gegen das Böse zur Seite steht und ihnen den entscheidenden Vorteil verschafft."
+    "Ein gefallener Ritter aus den Schattenkriegen des Hochmittelalters, dessen Seele durch endlose Schlachten verhärtet wurde.",
+    "Ein unerschrockener Held, der sich den Mächten der Dunkelheit entgegenstellt.",
+    "Eine Goblin Armee, die aus den Tiefen der Wälder aufsteigt, um Chaos zu verbreiten.",
+    "Ein hinterhältiger Hinterhalt, der die Feinde überrascht und ihnen den Boden wegzieht.",
+    "Schlechte Zeiten, in denen nur die Mutigsten überleben können.",
+    "Reichtum aus den Schätzen der alten Königreiche.",
+    "Kavallerie, die mit unbändiger Kraft über das Schlachtfeld stürmt.",
+    "Unterstützung, die den Helden den entscheidenden Vorteil verschafft."
 ];
-const html_karte = '<div class="spielkarte" onclick="flip(this)"><div class="front"><span class="kartenTitel"></span><img alt="Bild der Spielkarte"/><p></p></div><div class="back"></div></div>'
-const standatdKarte = '<div class="pseudokarte"></div>'
-let round = "player";
-const card_ids = [];
-const hand = {
-    1:{
-        card: null,
-        posx: "25vw",
-        posy: "-10px",
-        rot: "-15deg"
-    },
-    2:{
-        card: null,
-        posx: "35vw",
-        posy: "10px",
-        rot: "-5deg"
-    },
-    3:{
-        card: null,
-        posx: "45vw",
-        posy: "10px",
-        rot: "10deg"
-    },
-    4:{
-        card: null,
-        posx: "55vw",
-        posy: "-5px",
-        rot: "20deg"
-    },
-    5:{
-        card: null,
-        posx: "65vw",
-        posy: "-10px",
-        rot: "25deg"
+
+// ===== SPIELZUSTAND =====
+const game = {
+    playerHP: 8000,
+    opponentHP: 8000,
+    playerField: Array(5).fill(null),
+    opponentField: Array(5).fill(null),
+    playerHand: [],
+    round: 'player',
+    roundCounter: 0,
+    timer: 60,
+    hasDrawnThisTurn: false,
+    hasPlayedThisTurn: false,   // max. 1 Karte pro Runde legen
+    hasAttackedThisTurn: false, // entweder legen ODER angreifen
+    selectedHandCard: null,     // { card, el }
+    attackingFieldIndex: null,
+};
+
+let cardIdCounter = 0;
+
+// ===== INIT =====
+window.addEventListener('DOMContentLoaded', () => {
+    randomizeStapel();
+    updateHP();
+    updateGameInfo();
+    load_opponent();
+    clock();
+
+    // Startkarten ziehen
+    for (let i = 0; i < 3; i++) drawPlayerCard();
+    game.hasDrawnThisTurn = true;
+    updateUI();
+});
+
+function randomizeStapel() {
+    const stapel = document.getElementsByClassName("pseudokarte");
+    for (let i = 0; i < stapel.length; i++) {
+        stapel[i].style.transform = "rotate(" + (Math.random() * 20 - 10) + "deg)";
     }
 }
-const opponent_hand = {
-    1:{
-        card: null,
-        posx: "25vw",
-        posy: "-15px",
-        rot: "15deg"
-    },
-    2:{
-        card: null,
-        posx: "30vw",
-        posy: "-10px",
-        rot: "5deg"
-    },
-    3:{
-        card: null,
-        posx: "35vw",
-        posy: "10px",
-        rot: "-10deg"
-    },
-    4:{
-        card: null,
-        posx: "40vw",
-        posy: "-15px",
-        rot: "-20deg"
-    },
-    5:{
-        card: null,
-        posx: "45vw",
-        posy: "-20px",
-        rot: "-25deg"
-    }
-}
-let roundCounter = 0;
-let timer = 5;
-load_opponent();
-clock();
-player_card_counter = 0;
-opponent_card_counter = 0;
 
-
-
-// const karte = document.getElementById("karte001")
-// const titel = karte.getElementsByTagName("div")[0].getElementsByTagName("span")[0];
-// const bild = karte.getElementsByTagName("div")[0].getElementsByTagName("img")[0];
-// const text = karte.getElementsByTagName("div")[0].getElementsByTagName("p")[0];
-//document.getElementById("karte001").classList.add("flipFrontStep2");
-
-const stapel = document.getElementsByClassName("pseudokarte");
-
-for(let i = 0; i < stapel.length; i++){
-    stapel[i].style.transform = "rotate(" + (Math.random() * 20 - 10) + "deg)";
+// ===== LEBENSPUNKTE =====
+function updateHP() {
+    document.getElementById('player-lp-value').textContent = game.playerHP;
+    document.getElementById('opponent-lp-value').textContent = game.opponentHP;
 }
 
-function flip(card){
-    if (card.classList.contains("flipFrontStep2")) {
-        card.classList.remove("flipFrontStep2");
-        card.classList.add("flipBackStep1");
+function applyDamage(target, amount) {
+    if (target === 'player') {
+        game.playerHP = Math.max(0, game.playerHP - amount);
+        document.getElementById('player-lp-display').classList.add('damage-flash');
+        setTimeout(() => document.getElementById('player-lp-display').classList.remove('damage-flash'), 600);
+    } else {
+        game.opponentHP = Math.max(0, game.opponentHP - amount);
+        document.getElementById('opponent-lp-display').classList.add('damage-flash');
+        setTimeout(() => document.getElementById('opponent-lp-display').classList.remove('damage-flash'), 600);
     }
-    else if (card.classList.contains("flipBackStep2")) {
-        card.classList.remove("flipBackStep2");
-        card.classList.add("flipFrontStep1");
-    }
-
-    setTimeout(function() {
-        if (card.classList.contains("flipFrontStep1")) {
-            card.getElementsByClassName("front")[0].style.display = "flex";
-            card.classList.remove("flipFrontStep1");
-            card.classList.add("flipFrontStep2");
-        }
-        else if (card.classList.contains("flipBackStep1")) {
-            card.getElementsByClassName("front")[0].style.display = "none";
-            card.classList.remove("flipBackStep1");
-            card.classList.add("flipBackStep2");
-            
-        }
-    }, 200);
+    updateHP();
+    if (game.playerHP <= 0) showMessage("Du hast verloren!");
+    else if (game.opponentHP <= 0) showMessage("Du hast gewonnen!");
 }
 
-function randomCard(karte){
-    titel = karte.getElementsByTagName("div")[0].getElementsByTagName("span")[0];
-    bild = karte.getElementsByTagName("div")[0].getElementsByTagName("img")[0];
-    text = karte.getElementsByTagName("div")[0].getElementsByTagName("p")[0];
-
-    let counter = Math.floor(Math.random() * imgs.length);
-    const maxCounter = imgs.length;
-    counter = counter + 1
-    if(counter >= maxCounter){
-        counter = 0;
-    }
-
-    titel.textContent = titles[counter];
-    bild.src = "./imgs/" + imgs[counter];
-    text.textContent = texts[counter];
+// ===== KARTEN ERSTELLEN =====
+function randomStat() {
+    return Math.floor(Math.random() * 2701) + 300; // 300–3000
 }
 
-function addPlayerCards(){
-    if(player_card_counter >= 5){
+function createCard() {
+    const idx = Math.floor(Math.random() * imgs.length);
+    return {
+        id: 'card_' + (++cardIdCounter),
+        name: titles[idx],
+        img: imgs[idx],
+        text: texts[idx],
+        atk: randomStat(),
+        def: randomStat(),
+    };
+}
+
+function buildHandCardElement(card) {
+    const el = document.createElement('div');
+    el.className = 'spielkarte on_hand';
+    el.id = card.id;
+    el.innerHTML = `
+        <div class="front">
+            <span class="kartenTitel">${card.name}</span>
+            <div class="kartenStatus">
+                <div><img src="./imgs/dmg.png" alt="ATK"><span>${card.atk}</span></div>
+                <div><img src="./imgs/deff.png" alt="DEF"><span>${card.def}</span></div>
+            </div>
+            <img src="./imgs/${card.img}" alt="${card.name}"/>
+            <p>${card.text}</p>
+        </div>
+        <div class="back"></div>`;
+    el.addEventListener('click', () => onHandCardClick(card, el));
+    return el;
+}
+
+// ===== HAND MANAGEMENT =====
+const handPositions = [
+    { left: "10vw",  bottom: "-10px", rot: "-20deg" },
+    { left: "20vw",  bottom: "10px",  rot: "-10deg" },
+    { left: "30vw",  bottom: "15px",  rot: "0deg"   },
+    { left: "40vw",  bottom: "10px",  rot: "10deg"  },
+    { left: "50vw",  bottom: "-10px", rot: "20deg"  },
+];
+
+function repositionHand() {
+    const els = document.querySelectorAll('.spielkarte.on_hand');
+    els.forEach((el, i) => {
+        const pos = handPositions[i] || handPositions[handPositions.length - 1];
+        el.style.left = pos.left;
+        el.style.bottom = pos.bottom;
+        el.style.transform = `rotate(${pos.rot})`;
+        el.style.zIndex = 10 + i;
+    });
+}
+
+function drawPlayerCard() {
+    if (game.playerHand.length >= 5) return;
+    const card = createCard();
+    game.playerHand.push(card);
+    const el = buildHandCardElement(card);
+    document.body.appendChild(el);
+    repositionHand();
+}
+
+function onDrawPileClick() {
+    if (game.round !== 'player') {
+        showMessage("Du bist nicht am Zug!");
         return;
     }
-    if(round == "player"){
-        if(roundCounter == 0 && player_card_counter == 0){
-            for(let i = 0; i < 3; i++){
-                addPlayerCard();
-                player_card_counter = 3;
+    if (game.hasDrawnThisTurn) {
+        showMessage("Du hast diese Runde bereits eine Karte gezogen!");
+        return;
+    }
+    if (game.playerHand.length >= 5) {
+        showMessage("Deine Hand ist voll!");
+        return;
+    }
+    drawPlayerCard();
+    game.hasDrawnThisTurn = true;
+    updateUI();
+}
+
+// ===== HANDKARTE ANKLICKEN =====
+function onHandCardClick(card, el) {
+    if (game.round !== 'player') return;
+
+    // Laufenden Angriff abbrechen
+    if (game.attackingFieldIndex !== null) {
+        cancelAttack();
+        return;
+    }
+
+    // Karte abwählen wenn bereits ausgewählt
+    if (game.selectedHandCard && game.selectedHandCard.card.id === card.id) {
+        deselectHandCard();
+        hideModeSelector();
+        return;
+    }
+
+    deselectHandCard();
+    game.selectedHandCard = { card, el };
+    el.classList.add('selected');
+    showModeSelector(card);
+}
+
+function deselectHandCard() {
+    if (game.selectedHandCard) {
+        game.selectedHandCard.el.classList.remove('selected');
+        game.selectedHandCard = null;
+    }
+}
+
+// ===== MODUS-AUSWAHL =====
+function showModeSelector(card) {
+    const sel = document.getElementById('card-mode-selector');
+    sel.classList.remove('hidden');
+    sel.querySelector('.preview-name').textContent = card.name;
+    sel.querySelector('.preview-atk').textContent = card.atk;
+    sel.querySelector('.preview-def').textContent = card.def;
+}
+
+function hideModeSelector() {
+    document.getElementById('card-mode-selector').classList.add('hidden');
+}
+
+function playSelectedCard(mode) {
+    if (!game.selectedHandCard) return;
+
+    if (game.hasPlayedThisTurn) {
+        showMessage("Du hast diese Runde bereits eine Karte gelegt!");
+        cancelCardPlay();
+        return;
+    }
+    if (game.hasAttackedThisTurn) {
+        showMessage("Du hast bereits angegriffen – du kannst nicht mehr legen!");
+        cancelCardPlay();
+        return;
+    }
+
+    const slotIndex = game.playerField.findIndex(s => s === null);
+    if (slotIndex === -1) {
+        showMessage("Das Spielfeld ist voll!");
+        return;
+    }
+
+    const { card, el } = game.selectedHandCard;
+
+    // Karte von der Hand entfernen
+    el.remove();
+    game.playerHand = game.playerHand.filter(c => c.id !== card.id);
+    repositionHand();
+
+    // Karte auf dem Feld platzieren
+    game.hasPlayedThisTurn = true;
+    const fieldCard = { ...card, mode, attacked: false };
+    game.playerField[slotIndex] = fieldCard;
+
+    const slot = document.querySelector(`#player-field .field-slot[data-index="${slotIndex}"]`);
+    renderFieldCard(slot, fieldCard, 'player', slotIndex);
+
+    deselectHandCard();
+    hideModeSelector();
+    updateUI();
+}
+
+function cancelCardPlay() {
+    deselectHandCard();
+    hideModeSelector();
+}
+
+// ===== FELDKARTE RENDERN =====
+function renderFieldCard(slot, cardData, owner, index) {
+    slot.innerHTML = '';
+    const el = document.createElement('div');
+    el.className = 'spielkarte field-card';
+    el.id = cardData.id + '_field';
+    el.innerHTML = `
+        <div class="front">
+            <span class="kartenTitel">${cardData.name}</span>
+            <div class="kartenStatus">
+                <div><img src="./imgs/dmg.png" alt="ATK"><span>${cardData.atk}</span></div>
+                <div><img src="./imgs/deff.png" alt="DEF"><span>${cardData.def}</span></div>
+            </div>
+            <img src="./imgs/${cardData.img}" alt="${cardData.name}"/>
+            <p>${cardData.text}</p>
+        </div>
+        <div class="back"></div>`;
+
+    if (cardData.mode === 'defense') {
+        el.classList.add('defense-mode');
+        el.querySelector('.front').style.display = 'none';
+        if (owner === 'player') {
+            el.classList.add('own-defense'); // hover zeigt Vorderseite
+        }
+    } else {
+        el.querySelector('.back').style.display = 'none';
+    }
+
+    if (owner === 'player') {
+        el.addEventListener('click', () => onPlayerFieldCardClick(index));
+    } else {
+        el.addEventListener('click', () => onOpponentFieldCardClick(index));
+    }
+
+    slot.appendChild(el);
+}
+
+// ===== ANGRIFFS-LOGIK =====
+function onPlayerFieldCardClick(index) {
+    if (game.round !== 'player') return;
+    const card = game.playerField[index];
+    if (!card) return;
+
+    if (card.mode === 'defense') {
+        showMessage("Verteidigungskarten können nicht angreifen!");
+        return;
+    }
+    if (card.attacked) {
+        showMessage("Diese Karte hat bereits angegriffen!");
+        return;
+    }
+    if (game.hasPlayedThisTurn) {
+        showMessage("Du hast diese Runde bereits eine Karte gelegt – du kannst nicht mehr angreifen!");
+        return;
+    }
+    if (game.hasAttackedThisTurn) {
+        showMessage("Du hast diese Runde bereits angegriffen!");
+        return;
+    }
+
+    if (game.selectedHandCard) {
+        deselectHandCard();
+        hideModeSelector();
+    }
+
+    if (game.attackingFieldIndex === index) {
+        cancelAttack();
+        return;
+    }
+
+    // Vorherigen Angreifer abwählen
+    if (game.attackingFieldIndex !== null) cancelAttack();
+
+    game.attackingFieldIndex = index;
+    const el = document.querySelector(`#player-field .field-slot[data-index="${index}"] .field-card`);
+    if (el) el.classList.add('attacking');
+
+    document.getElementById('opponent-lp-display').classList.add('attackable');
+    showMessage("Wähle ein Ziel: gegnerische Karte oder Lebenspunkte anklicken");
+}
+
+function cancelAttack() {
+    if (game.attackingFieldIndex !== null) {
+        const el = document.querySelector(`#player-field .field-slot[data-index="${game.attackingFieldIndex}"] .field-card`);
+        if (el) el.classList.remove('attacking');
+        game.attackingFieldIndex = null;
+    }
+    document.getElementById('opponent-lp-display').classList.remove('attackable');
+    hideMessage();
+}
+
+function onOpponentFieldCardClick(index) {
+    if (game.round !== 'player') return;
+    if (game.attackingFieldIndex === null) return;
+
+    const attacker = game.playerField[game.attackingFieldIndex];
+    const defender = game.opponentField[index];
+    if (!attacker || !defender) return;
+
+    resolveAttack(attacker, game.attackingFieldIndex, defender, index);
+}
+
+function resolveAttack(attacker, atkIdx, defender, defIdx) {
+    const atkSlot = document.querySelector(`#player-field .field-slot[data-index="${atkIdx}"]`);
+    const defSlot = document.querySelector(`#opponent-field .field-slot[data-index="${defIdx}"]`);
+
+    if (defender.mode === 'defense') {
+        // Verteidigungskarte aufdecken
+        const defEl = defSlot.querySelector('.field-card');
+        if (defEl) {
+            defEl.querySelector('.front').style.display = 'flex';
+            defEl.querySelector('.back').style.display = 'none';
+            defEl.classList.remove('defense-mode');
+        }
+
+        if (attacker.atk > defender.def) {
+            game.opponentField[defIdx] = null;
+            defSlot.innerHTML = '';
+            // Kein LP-Schaden beim Besiegen einer Verteidigungskarte
+        } else if (attacker.atk < defender.def) {
+            applyDamage('player', defender.def - attacker.atk);
+        }
+        // Gleichstand: keine Auswirkungen
+    } else {
+        // Angriff vs. Angriff
+        if (attacker.atk > defender.atk) {
+            applyDamage('opponent', attacker.atk - defender.atk);
+            game.opponentField[defIdx] = null;
+            defSlot.innerHTML = '';
+        } else if (attacker.atk < defender.atk) {
+            applyDamage('player', defender.atk - attacker.atk);
+            game.playerField[atkIdx] = null;
+            atkSlot.innerHTML = '';
+        } else {
+            // Gleichstand: beide zerstört
+            game.opponentField[defIdx] = null;
+            game.playerField[atkIdx] = null;
+            defSlot.innerHTML = '';
+            atkSlot.innerHTML = '';
+        }
+    }
+
+    if (game.playerField[atkIdx]) {
+        game.playerField[atkIdx].attacked = true;
+        const atkEl = atkSlot.querySelector('.field-card');
+        if (atkEl) {
+            atkEl.classList.remove('attacking');
+            atkEl.classList.add('exhausted');
+        }
+    }
+
+    game.hasAttackedThisTurn = true;
+    game.attackingFieldIndex = null;
+    document.getElementById('opponent-lp-display').classList.remove('attackable');
+    hideMessage();
+    updateUI();
+}
+
+function onDirectAttack() {
+    if (game.round !== 'player') return;
+    if (game.attackingFieldIndex === null) return;
+
+    const opponentHasCards = game.opponentField.some(c => c !== null);
+    if (opponentHasCards) {
+        showMessage("Der Gegner hat Karten auf dem Feld – du musst diese zuerst angreifen!");
+        return;
+    }
+
+    const attacker = game.playerField[game.attackingFieldIndex];
+    if (!attacker) return;
+
+    applyDamage('opponent', attacker.atk);
+    attacker.attacked = true;
+
+    const atkEl = document.querySelector(`#player-field .field-slot[data-index="${game.attackingFieldIndex}"] .field-card`);
+    if (atkEl) {
+        atkEl.classList.remove('attacking');
+        atkEl.classList.add('exhausted');
+    }
+
+    game.hasAttackedThisTurn = true;
+    game.attackingFieldIndex = null;
+    document.getElementById('opponent-lp-display').classList.remove('attackable');
+    hideMessage();
+    updateUI();
+}
+
+// ===== ZUG-MANAGEMENT =====
+function endPlayerTurn() {
+    if (game.round !== 'player') return;
+    cancelAttack();
+    deselectHandCard();
+    hideModeSelector();
+
+    // Angriffs-Erschöpfung zurücksetzen
+    game.playerField.forEach((c, i) => {
+        if (!c) return;
+        c.attacked = false;
+        const el = document.querySelector(`#player-field .field-slot[data-index="${i}"] .field-card`);
+        if (el) el.classList.remove('exhausted');
+    });
+
+    game.round = 'opponent';
+    game.hasDrawnThisTurn = false;
+    game.hasPlayedThisTurn = false;
+    game.hasAttackedThisTurn = false;
+    game.timer = 60;
+    updateGameInfo();
+    updateUI();
+
+    // Gegner-Zug — Logik wird vom Server übertragen
+    onOpponentTurn();
+}
+
+function onOpponentTurn() {
+    // Wird vom Server übertragen
+}
+
+function startPlayerTurn() {
+    game.round = 'player';
+    game.hasDrawnThisTurn = false;
+    game.hasPlayedThisTurn = false;
+    game.hasAttackedThisTurn = false;
+    game.roundCounter++;
+    game.timer = 60;
+    updateGameInfo();
+    updateUI();
+}
+
+// ===== GEGNER-FELD (wird vom Server befüllt) =====
+function placeOpponentCard(cardData, mode, slotIndex) {
+    // Wird vom Server aufgerufen
+    game.opponentField[slotIndex] = { ...cardData, mode, attacked: false };
+    const slot = document.querySelector(`#opponent-field .field-slot[data-index="${slotIndex}"]`);
+    if (slot) renderFieldCard(slot, { ...cardData, mode }, 'opponent', slotIndex);
+}
+
+function removeOpponentCard(slotIndex) {
+    // Wird vom Server aufgerufen
+    game.opponentField[slotIndex] = null;
+    const slot = document.querySelector(`#opponent-field .field-slot[data-index="${slotIndex}"]`);
+    if (slot) slot.innerHTML = '';
+}
+
+// ===== TIMER =====
+function clock() {
+    setInterval(() => {
+        game.timer--;
+        if (game.timer < 0) {
+            if (game.round === 'player') {
+                endPlayerTurn();
+            } else {
+                startPlayerTurn();
             }
         }
-        else{
-            addPlayerCard();
-            player_card_counter += 1;
-        }
-
-    } 
-}
-
-function addPlayerCard(){
-    // HTML-String in ein Element umwandeln
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = html_karte;
-        const new_karte = tempDiv.firstChild;
-        let new_random_id = "karte" + Math.floor(Math.random() * 1000000);
-        while(card_ids.includes(new_random_id)){
-            new_random_id = "karte" + Math.floor(Math.random() * 1000000);
-        }
-        new_karte.id = new_random_id;
-        new_karte.classList.add("on_hand")
-        card_ids.push(new_random_id);
-        document.getElementsByTagName("body")[0].appendChild(new_karte);
-        
-        const handcards = document.getElementsByClassName("on_hand");
-        for(let i = 0; i < handcards.length; i++){
-            randomCard(handcards[handcards.length - 1]);
-            hand[i+1].card = handcards[i];
-            handcards[i].style.left = hand[i+1].posx;
-            handcards[i].style.bottom = hand[i+1].posy;
-            handcards[i].style.transform = "rotate(" + hand[i+1].rot + ")";
-        }
-}
-
-function clock(){
-    const gameinfo = document.getElementById("gameinfo");
-    const runde = gameinfo.getElementsByTagName("span")[0]
-    const currentPlayer = gameinfo.getElementsByTagName("span")[1]
-    
-    setInterval(function() {
-        timer--;
-        if(timer < 0){
-           timer = 5;
-           if(round == "player"){
-            round = "opponent";
-            addOpponentCards();
-            runde.textContent = parseInt(runde.textContent) +1;
-            roundCounter += 1;
-           }
-           else{
-            round = "player";
-           }
-           
-            currentPlayer.textContent = round;
-        }
-        if(timer <= 10){
-            document.getElementById("timer").style.color = "red";
-        }
-        else{
-            document.getElementById("timer").style.color = "black";
-        }
-        document.getElementById("timer").textContent = timer;
-        
+        document.getElementById('timer').textContent = Math.max(0, game.timer);
+        document.getElementById('timer').style.color = game.timer <= 10 ? 'red' : 'black';
     }, 1000);
 }
-function addOpponentCards(){
-    if(opponent_card_counter >= 5){
-        return;
-    }
-    if(roundCounter == 0 && opponent_card_counter == 0){
-        for(let i = 0; i < 3; i++){
-            addOpponentCard();
-            opponent_card_counter = 3;
-        }
-        
-    }
-    else{
-        addOpponentCard();
-        opponent_card_counter += 1;
-    }
 
+// ===== UI UPDATE =====
+function updateGameInfo() {
+    const spans = document.getElementById('gameinfo').getElementsByTagName('span');
+    spans[0].textContent = game.roundCounter;
+    spans[1].textContent = game.round === 'player' ? 'Spieler' : 'Gegner';
 }
 
-function addOpponentCard(){
-            // HTML-String in ein Element umwandeln
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = standatdKarte;
-        const new_karte = tempDiv.firstChild;
-        let new_random_id = "karte" + Math.floor(Math.random() * 1000000);
-        while(card_ids.includes(new_random_id)){
-            new_random_id = "karte" + Math.floor(Math.random() * 1000000);
-        }
-        new_karte.id = new_random_id;
-        new_karte.classList.add("on_opponent_hand")
-        card_ids.push(new_random_id);
-        document.getElementsByTagName("body")[0].appendChild(new_karte);
+function updateUI() {
+    updateHP();
+    updateGameInfo();
 
-        const handcards = document.getElementsByClassName("on_opponent_hand");
-        for(let i = 0; i < handcards.length; i++){
-            opponent_hand[i+1].card = handcards[i];
-            handcards[i].style.left = opponent_hand[i+1].posx;
-            handcards[i].style.top = opponent_hand[i+1].posy;
-            handcards[i].style.transform = "rotate(" + opponent_hand[i+1].rot + ")";
+    // Zugstapel visuell sperren
+    const drawTop = document.querySelector('.draw-top');
+    if (drawTop) {
+        if (game.round !== 'player' || game.hasDrawnThisTurn) {
+            drawTop.classList.add('disabled');
+        } else {
+            drawTop.classList.remove('disabled');
         }
+    }
 
+    // "Zug beenden"-Button
+    const btn = document.getElementById('end-turn-btn');
+    if (btn) btn.disabled = game.round !== 'player';
+
+    // Angriffsfähige Karten markieren
+    const canAttackNow = game.round === 'player' && !game.hasPlayedThisTurn && !game.hasAttackedThisTurn;
+    game.playerField.forEach((card, i) => {
+        const el = document.querySelector(`#player-field .field-slot[data-index="${i}"] .field-card`);
+        if (!el) return;
+        if (card && card.mode === 'attack' && !card.attacked && canAttackNow) {
+            el.classList.add('can-attack');
+        } else {
+            el.classList.remove('can-attack');
+        }
+    });
 }
 
-async function load_opponent(){
-    const response = await fetch("/opponent");
-    const data = await response.json();
-    const opponent_name = data.name;
-    const opponent_image = data.image;
+function showMessage(msg) {
+    const el = document.getElementById('game-message');
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    clearTimeout(el._timeout);
+    el._timeout = setTimeout(() => el.classList.add('hidden'), 3000);
+}
 
+function hideMessage() {
+    document.getElementById('game-message').classList.add('hidden');
+}
 
-    const opponent_profile = document.getElementById("opponent");
-    const img = document.createElement("img");
-    img.src = opponent_image;
-    opponent_profile.appendChild(img);
-    const name = document.createElement("div");
-    name.textContent = opponent_name;
-    opponent_profile.appendChild(name);
-    img.setAttribute("alt", "Profilbild des Gegners");
-    img.setAttribute("id", "opponent_img");
-    name.setAttribute("id", "opponent_name");
+// ===== GEGNER LADEN =====
+async function load_opponent() {
+    try {
+        const response = await fetch("/opponent");
+        const data = await response.json();
+        const profile = document.getElementById("opponent");
+        const img = document.createElement("img");
+        img.src = data.image;
+        img.id = "opponent_img";
+        img.alt = "Profilbild des Gegners";
+        const name = document.createElement("div");
+        name.textContent = data.name;
+        name.id = "opponent_name";
+        profile.appendChild(img);
+        profile.appendChild(name);
+    } catch (e) {
+        // Server nicht erreichbar
+    }
 }
