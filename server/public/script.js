@@ -111,10 +111,10 @@ function buildHandCardElement(card) {
 // ===== HAND MANAGEMENT =====
 const handPositions = [
     { left: "10vw",  bottom: "-10px", rot: "-20deg" },
-    { left: "20vw",  bottom: "10px",  rot: "-10deg" },
-    { left: "30vw",  bottom: "15px",  rot: "0deg"   },
-    { left: "40vw",  bottom: "10px",  rot: "10deg"  },
-    { left: "50vw",  bottom: "-10px", rot: "20deg"  },
+    { left: "17vw",  bottom: "10px",  rot: "-10deg" },
+    { left: "25vw",  bottom: "15px",  rot: "0deg"   },
+    { left: "33vw",  bottom: "10px",  rot: "10deg"  },
+    { left: "40vw",  bottom: "-10px", rot: "20deg"  },
 ];
 
 function repositionHand() {
@@ -124,7 +124,7 @@ function repositionHand() {
         el.style.left = pos.left;
         el.style.bottom = pos.bottom;
         el.style.transform = `rotate(${pos.rot})`;
-        el.style.zIndex = 10 + i;
+        el.style.zIndex = 10 + i;       
     });
 }
 
