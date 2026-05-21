@@ -21,3 +21,20 @@ function showScoreboard() {
 function nav_to_menu(){
     window.location.href = `./`;
 }
+
+
+function getUsername() {
+    return fetch('/api/me')
+        .then(response => response.json())
+        .then(data => data.user.username)
+        .catch(error => {
+            console.error('Fehler beim Abrufen des Benutzernamens:', error);
+            return null;
+        });     
+}
+
+getUsername().then(username => {
+    if (username) {
+        document.getElementById('username_display').textContent = username;
+    }
+});

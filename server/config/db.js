@@ -10,4 +10,4 @@ const config = {
     port: process.env.PORT || 3306
 };
 
-module.exports = config;
+module.exports = db = require('mysql2/promise').createPool(config.db);

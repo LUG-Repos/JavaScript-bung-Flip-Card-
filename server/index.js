@@ -1,19 +1,39 @@
 //------------------- ZUGANGSDATEN FÜR DIE DATENBANK -------------------
-const dotenv = require('./config');
-const {host, user, password, database} = dotenv.db;
-
+const connection = require('./config/db');
 //----------------------------------------------------------------------
 
 const express = require('express')
 const path = require('path')
 const mysql = require('mysql2/promise');
+const session = require('express-session');
+const passport = require('./config/passport');
+const authRoutes = require('./routes/auth');
+const dotenv = require('dotenv').config();
 const app = express()
 const port = 3022
 app.use(express.static(path.join(__dirname, 'public'), {extensions: ['html']}));
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // In Produktion sollte dies auf true gesetzt werden, wenn HTTPS verwendet wird
+        maxAge: 1000 * 60 * 60 * 2, // 2 Stunden
+        httpOnly: true
+     } // In Produktion sollte dies auf true gesetzt werden, wenn HTTPS verwendet wird
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use('/api', authRoutes);
+
+
+
+
+
 spielraum = []
-
-
 
 async function init_Opponent(){
     const response = await fetch("https://randomuser.me/api/");
@@ -46,7 +66,6 @@ app.get('/spielraum', (req, res) => {
 });
 
 app.get('/testdb', async (req, res) => {   
-    const connection = await mysql.createConnection({host, user, password, database});
     const [rows] = await connection.execute('SHOW TABLES');
     res.json(rows);
 });

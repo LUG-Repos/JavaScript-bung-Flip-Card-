@@ -8,6 +8,20 @@
     <script src="menu.js" defer></script>
 </head>
 <body>
+    <header>
+        <nav class="menu_bar">
+            <div>
+                <a href="./wiki">Wie wird gespielt</a>
+                <a href="./datenschutz">Datenschutz</a>
+                <a href="./impressum">Impressum</a>
+                <a href="./geschaeftsbedingungen">Allgemeine Geschäftsbedingungen</a>
+            </div>
+            <div class="profile_nav">
+                <img src="./imgs/profil.jpg" alt="Profibild"/>
+                <span id="username_display">Benutzername</span>
+            </div>
+        </nav>
+    </header>
     <div class="main_menu">
         <button onclick="startGame('human')">Spiel vs Mensch</button>
         <button onclick="startGame('ai')">Spiel vs KI</button>
